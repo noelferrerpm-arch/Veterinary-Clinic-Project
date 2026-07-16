@@ -1,0 +1,85 @@
+### login Inventory keeper
+POST http://localhost:8080/loginJWT
+content-type: application/json
+
+{
+  "userId": 6,
+  "password": "password123"
+}
+> {%
+    client.global.set("auth_token", response.headers.valueOf("Authorization"));
+    client.log("token: " + response.headers.valueOf("Authorization"));
+%}
+
+### login Veterinarian
+POST http://localhost:8080/loginJWT
+content-type: application/json
+
+{
+  "userId": 1,
+  "password": "password123"
+}
+> {%
+    client.global.set("auth_token", response.headers.valueOf("Authorization"));
+    client.log("token: " + response.headers.valueOf("Authorization"));
+%}
+
+### Create medication test
+POST http://localhost:8080/api/medication
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+{
+  "name": "Plexifolito",
+  "activeIngredient": "Cositas",
+  "dosageUnit": 2,
+  "unitPrice": 10
+}
+### Create medication batch test
+POST http://localhost:8080/api/medication/1/batches
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+{
+  "lotNumber": 1,
+  "receivedDate": "2024-01-01",
+  "expiryDate": "2030-01-01",
+  "initialQuantity": 10,
+  "purchagePricePerUnit": 1,
+  "storageLocation": "Si",
+  "reorderThreshold": 5
+}
+### Get medication test
+GET http://localhost:8080/api/medication
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+### Get medication batch test
+GET http://localhost:8080/api/medication/batches/5
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+### Buy medication
+GET http://localhost:8080/api/medication/1/buy/5
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+### Create incompatibility
+PUT http://localhost:8080/api/medication/1/incompatibility/add/3
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+### Remove incompatibility
+PUT http://localhost:8080/api/medication/1/incompatibility/remove/3
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+### Get meds between dates
+GET http://localhost:8080/api/medication/start/2023-01-01/end/2025-01-01
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+### Get vets between dates of meds
+GET http://localhost:8080/api/medication/1/start/2023-01-01/end/2025-01-01
+Content-Type: application/json
+Authorization: {{auth_token}}

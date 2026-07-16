@@ -1,0 +1,56 @@
+### login Receptionist
+POST http://localhost:8080/loginJWT
+content-type: application/json
+
+{
+  "userId": 3,
+  "password": "password123"
+}
+> {%
+    client.global.set("auth_token", response.headers.valueOf("Authorization"));
+    client.log("token: " + response.headers.valueOf("Authorization"));
+%}
+
+### Create pet owner
+POST http://localhost:8080/api/pet/owner
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+{
+  "firstName": "Paco",
+  "lastName": "Sahur",
+  "phoneNumber": "789769632",
+  "email": "papapapapasahur@gmail.com",
+  "address": "Some street over there,21",
+  "loyaltyPoints": 0,
+  "loyaltyTierId": 1,
+  "pets": []
+}
+
+### Get owner by id
+GET http://localhost:8080/api/pet/owner/2
+Authorization: {{auth_token}}
+
+### Create pet
+POST http://localhost:8080/api/pet
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+{
+  "petOwnerId": 2,
+  "petTypeId": 1,
+  "name": "Lili",
+  "microchipId": "asasdadwe",
+  "dateOfBirth": "2020-03-03",
+  "gender": "female",
+  "breed": "Podenco",
+  "color": "white",
+  "weight": "10 kg"
+}
+
+### Get pet by id
+GET http://localhost:8080/api/pet/1
+Authorization: {{auth_token}}
+### Get loyalty points from an owner
+GET http://localhost:8080/api/pet/owner/2/fidelity
+Authorization: {{auth_token}}

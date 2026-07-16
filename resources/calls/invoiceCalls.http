@@ -1,0 +1,112 @@
+# InvoiceCalls.http
+//second commit
+@baseUrl = http://localhost:8080/api/invoices
+@invoiceId = 1
+@secondInvoiceId = 2
+@visitId = 4
+@petOwnerId = 2
+
+### login Receptionist
+POST http://localhost:8080/loginJWT
+content-type: application/json
+
+{
+  "userId": 3,
+  "password": "password123"
+}
+> {%
+    client.global.set("auth_token", response.headers.valueOf("Authorization"));
+    client.log("token: " + response.headers.valueOf("Authorization"));
+%}
+
+### 1. Crear una Factura (createInvoice) EJECUTAR 2 VECES
+POST {{baseUrl}}
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+{
+  "invoiceDate": "2025-11-20",
+  "totalAmount": 150.00,
+  "status": "UNPAID",
+  "petOwnerId": {{petOwnerId}},
+  "items": [
+    {
+      "description": "Annual Check-up",
+      "quantity": 1,
+      "unitPrice": 80.00,
+      "itemTotal": 80.00
+    },
+    {
+      "description": "Vaccination",
+      "quantity": 1,
+      "unitPrice": 70.00,
+      "itemTotal": 70.00
+    }
+  ],
+  "payments": []
+}
+
+### 2. Obtener una Factura por ID (getInvoice)
+GET {{baseUrl}}/{{invoiceId}}
+Authorization: {{auth_token}}
+
+### 3. Listar todas las Facturas (listInvoices)
+GET {{baseUrl}}
+Authorization: {{auth_token}}
+
+### 4. Actualizar una Factura (updateInvoice)
+# Nota: Este endpoint solo actualiza totalAmount, discount y status.
+PUT {{baseUrl}}/{{invoiceId}}
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+{
+  "totalAmount": 160.00,
+  "status": "UNPAID"
+}
+
+### 5. Procesar un Pago para una Factura (processPayment)
+# Asumiendo que PaymentMethod es un Enum (e.g., CARD, CASH, TRANSFER)
+POST {{baseUrl}}/{{invoiceId}}/payments?amountPaid=159.76&paymentMethod=CARD
+Authorization: {{auth_token}}
+
+### 6. Eliminar una Factura (deleteInvoice) DEBE DAR 422 SI SE HA PAGADO ALGO Y DEBE DAR 204 SIN NO HAY PAGOS
+# **ADVERTENCIA:** Solo funciona si no tiene pagos registrados.
+DELETE {{baseUrl}}/{{invoiceId}}
+Authorization: {{auth_token}}
+
+//HAY QUE IR A VETERINARY CALLS E INICIAR Y TERMINAR UNA VISITA PARA QUE FUNCIONE
+### 7. Generar Factura desde una Visita (generateInvoiceFromVisit)
+# Requiere que la visita {{visitId}} exista y tenga el estado 'Completed'.
+POST {{baseUrl}}/from-visit/{{visitId}}
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+### 8. Generar Factura desde una Visita (generateInvoiceFromVisit) SIN COMPLETAR
+# Requiere que la visita 1 exista y tenga el estado 'Completed'.
+POST {{baseUrl}}/from-visit/1
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+### 9. Aplicar Descuento Manual (applyManualDiscount)
+# Aplica un 10% de descuento manual a la factura {{invoiceId}}.
+PATCH {{baseUrl}}/{{secondInvoiceId}}/apply-discount?percentage=10.0
+Authorization: {{auth_token}}
+
+### 10. Crear una Venta de Medicación (createMedicationSale)
+# Requiere que la medicación con ID 1 y 2 existan.
+POST {{baseUrl}}/medication-sale?petOwnerId={{petOwnerId}}
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+[
+  {
+    "medicationId": 1,
+    "quantity": 2
+  },
+  {
+    "medicationId": 2,
+    "quantity": 1
+  }
+]
+

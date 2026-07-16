@@ -1,0 +1,173 @@
+### login Veterinarian
+POST http://localhost:8080/loginJWT
+content-type: application/json
+
+{
+  "userId": 1,
+  "password": "password123"
+}
+> {%
+    client.global.set("auth_token", response.headers.valueOf("Authorization"));
+    client.log("token: " + response.headers.valueOf("Authorization"));
+%}
+
+### Create veterinarian
+POST http://localhost:8080/api/veterinarian
+content-type: application/json
+Authorization: {{auth_token}}
+
+{
+  "firstName": "Cristina",
+  "lastName": "de la Iglesia",
+  "phoneNumber": "691384027",
+  "email": "cristinadelaig2@gmail.com",
+  "address": "c/Cala Pola nº2",
+  "licenseNumber": 3,
+  "yearsOfExperience": 10
+}
+
+### Create veterinarian duplicate email error UNPROCESSABLE ENTITY
+POST http://localhost:8080/api/veterinarian
+content-type: application/json
+Authorization: {{auth_token}}
+
+{
+  "firstName": "Cristina",
+  "lastName": "de la Iglesia",
+  "phoneNumber": "691384027",
+  "email": "cristinadelaig2@gmail.com",
+  "address": "c/Cala Pola nº2",
+  "licenseNumber": 3,
+  "yearsOfExperience": 10
+}
+
+### Get available veterinarians
+GET http://localhost:8080/api/veterinarian/available
+Authorization: {{auth_token}}
+
+### Get all veterinarians
+GET http://localhost:8080/api/veterinarian
+Authorization: {{auth_token}}
+
+### Create a walk-in visit
+POST http://localhost:8080/api/veterinarian/1/visits/walk-in
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+{
+  "petId": 1,
+  "ownerId": 2,
+  "agendaId": 3,
+  "duration": 30,
+  "reason": "Pupa",
+  "price": 20
+}
+### Create a visit
+POST http://localhost:8080/api/veterinarian/visit
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+{
+  "petId": 1,
+  "ownerId": 2,
+  "agendaId": 3,
+  "id": null,
+  "startDate": "2025-11-20T10:00:00",
+  "duration": 15,
+  "reason": "Getting spayed",
+  "price": 1000
+}
+
+### Reeschedule visit
+PUT http://localhost:8080/api/veterinarian/visits/1
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+{
+  "petId": 1,
+  "ownerId": 2,
+  "agendaId": 3,
+  "startDate": "2025-11-30T10:00:00",
+  "duration": 0,
+  "reason": null,
+  "price": null
+}
+
+### Get all visits that occur in a period
+GET http://localhost:8080/api/veterinarian/1/visits/start/2024-01-01/end/2026-12-31
+Authorization: {{auth_token}}
+### Get all visits
+GET http://localhost:8080/api/veterinarian/visits
+Authorization: {{auth_token}}
+
+### Modify status to not shown up
+PUT http://localhost:8080/api/veterinarian/visits/3/noshow
+Authorization: {{auth_token}}
+### Start a visit
+PUT http://localhost:8080/api/veterinarian/visits/1/initiate
+Authorization: {{auth_token}}
+
+### End a visit
+PUT http://localhost:8080/api/veterinarian/visits/1/complete
+Authorization: {{auth_token}}
+### Get a visit by Id
+GET http://localhost:8080/api/veterinarian/visits/1
+Authorization: {{auth_token}}
+
+### Get a visit by Id NOT FOUND
+GET http://localhost:8080/api/veterinarian/visits/10
+Authorization: {{auth_token}}
+
+### Add diagnosis to visit
+PATCH http://localhost:8080/api/veterinarian/visits/1/diagnosis
+content-type: application/json
+Authorization: {{auth_token}}
+
+
+{
+  "diagnosis": "El perro tiene una fractura en la pata trasera derecha.",
+  "notes": "Se recomienda reposo absoluto y analgésicos."
+}
+### Cancel a scheduled visit
+PUT http://localhost:8080/api/veterinarian/visits/5/cancel
+Authorization: {{auth_token}}
+
+### Cancel a scheduled visit that is not in scheduled status error UNPROCESSABLE ENTITY
+PUT http://localhost:8080/api/veterinarian/visits/4/cancel
+Authorization: {{auth_token}}
+
+### Delete a visit
+DELETE http://localhost:8080/api/veterinarian/visits/2
+Authorization: {{auth_token}}
+
+### Prescribe a medication
+POST http://localhost:8080/api/veterinarian/visits/6/prescribe-medication
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+{
+  "quantityPrescribed": 1,
+  "dosageInstructions": "ddd",
+  "duration": 3,
+  "visitID": 6,
+  "medicationId": 1
+}
+### Checks if pet is incompatible with medicine
+GET http://localhost:8080/api/veterinarian/pet/1/incompatible/1
+Authorization: {{auth_token}}
+
+### Prescribe a treatment in a visit
+POST http://localhost:8080/api/veterinarian/visits/1/prescribe-treatment
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+{
+  "treatmentId": 1,
+  "name": "Nail clipper",
+  "description": "Cuts animals nails",
+  "cost": 50
+}
+
+### Get a veterinarian's agenda
+GET http://localhost:8080/api/veterinarian/1/agenda
+Authorization: {{auth_token}}

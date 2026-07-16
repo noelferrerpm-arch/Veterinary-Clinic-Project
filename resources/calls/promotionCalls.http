@@ -1,0 +1,121 @@
+### login Administrator
+POST http://localhost:8080/loginJWT
+content-type: application/json
+
+{
+  "userId": 5,
+  "password": "password123"
+}
+> {%
+    client.global.set("auth_token", response.headers.valueOf("Authorization"));
+    client.log("token: " + response.headers.valueOf("Authorization"));
+%}
+
+### Create promotion test
+POST http://localhost:8080/api/promotion
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+{
+  "name": "Epic promotion",
+  "description": "Test to check if createpromotion works",
+  "discountCode": "1",
+  "startDate": "2023-11-13",
+  "endDate": "2030-11-13",
+  "discounts": []
+}
+### Promotion to be updated
+POST http://localhost:8080/api/promotion
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+{
+  "name": "Update test",
+  "description": "Not updated",
+  "discountCode": "1",
+  "startDate": "2023-11-13",
+  "endDate": "2030-11-13",
+  "discounts": []
+}
+### Get first promotion
+GET http://localhost:8080/api/promotion/1
+Authorization: {{auth_token}}
+### Promotion should be modified
+PUT http://localhost:8080/api/promotion/2
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+{
+  "name": "Update test works",
+  "description": "Updated",
+  "discountCode": "3",
+  "startDate": "2024-11-13",
+  "endDate": "2028-11-13",
+  "discounts": []
+}
+### Get all promotion
+GET http://localhost:8080/api/promotion
+Authorization: {{auth_token}}
+### Deletes updated promotion
+DELETE http://localhost:8080/api/promotion/2
+Authorization: {{auth_token}}
+### Check if promotion has been removed
+GET http://localhost:8080/api/promotion
+Authorization: {{auth_token}}
+### Add discount to promotion 1
+POST http://localhost:8080/api/promotion/1/discount/
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+{
+  "code": "777",
+  "type": "PERCENTAGE",
+  "discountValue": 20.00,
+  "startDate": "2024-11-13",
+  "endDate": "2028-11-13",
+  "maxUses": 50,
+  "usesCount": 0
+}
+### Check if promotion has discount
+GET http://localhost:8080/api/promotion/1
+Authorization: {{auth_token}}
+###This discount will be updated
+POST http://localhost:8080/api/promotion/1/discount/
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+{
+  "code": "555",
+  "type": "PERCENTAGE",
+  "discountValue": 20.00,
+  "startDate": "2024-11-13",
+  "endDate": "2028-11-13",
+  "maxUses": 50,
+  "usesCount": 0
+}
+###Update discount
+PUT http://localhost:8080/api/promotion/1/discount/2
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+{
+  "code": "555",
+  "type": "PERCENTAGE",
+  "discountValue": 10,
+  "startDate": "2024-11-13",
+  "endDate": "2029-11-13",
+  "maxUses": 1000,
+  "usesCount": 1
+}
+### Discount has been updated
+GET http://localhost:8080/api/promotion/1
+Authorization: {{auth_token}}
+### Delete discount from promotion
+DELETE http://localhost:8080/api/promotion/1/discount/2
+Authorization: {{auth_token}}
+### Get discounts from one promotion
+GET http://localhost:8080/api/promotion/1/discounts
+Authorization: {{auth_token}}
+### Get discount analytics
+GET http://localhost:8080/api/promotion/analytics
+Authorization: {{auth_token}}

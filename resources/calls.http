@@ -1,0 +1,311 @@
+### login
+POST http://localhost:8080/loginJWT
+content-type: application/json
+
+{
+  "userId": 1,
+  "password": "password123"
+}
+> {%
+    client.global.set("auth_token", response.headers.valueOf("Authorization"));
+    client.log("token: " + response.headers.valueOf("Authorization"));
+%}
+
+###
+POST http://localhost:8080/api/veterinarian
+content-type: application/json
+Authorization: {{auth_token}}
+
+{
+  "firstName": "Cristina",
+  "lastName": "de la Iglesia",
+  "phoneNumber": "691384027",
+  "email": "cristinadelaiglesia2@gmail.com",
+  "address": "c/Cala Pola nº2",
+  "licenseNumber": 3,
+  "yearsOfExperience": 10
+}
+
+###
+POST http://localhost:8080/api/pet/owner
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+{
+  "firstName": "Pepe",
+  "lastName": "Palote",
+  "phoneNumber": "666666666",
+  "email": "pepepalote@gmail.com",
+  "address": "c/ hola nº3",
+  "loyaltyTierId": 1
+}
+
+###
+POST http://localhost:8080/api/pet
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+{
+  "petOwnerId": 1,
+  "petTypeId": 1,
+  "name": "Golf",
+  "microchipId": "1122",
+  "dateOfBirth": "2012-07-14",
+  "gender": "m",
+  "breed": "German shepherd",
+  "color": "oscuro",
+  "weight": "40kg"
+}
+
+###
+POST http://localhost:8080/api/veterinarian/1/availability
+content-type: application/json
+Authorization: {{auth_token}}
+
+{
+  "dayOfWeek": 6,
+  "startTime": "09:00",
+  "endTime": "22:50",
+  "periodStart": "2025-10-09",
+  "periodEnd": "2025-12-20"
+}
+
+
+###
+POST http://localhost:8080/api/veterinarian/1/visits/walk-in
+Content-Type: application/json
+Authorization: {{auth_token}}
+
+{
+  "petId": 1,
+  "ownerId": 2,
+  "duration": 30,
+  "reason": "Pupa",
+  "price": 20
+}
+
+###
+GET http://localhost:8080/api/veterinarian/demand/start/2025-11-11/end/2025-12-09
+Authorization: {{auth_token}}
+
+###
+PUT http://localhost:8080/api/veterinarian/1/availability/1
+content-type: application/json
+Authorization: {{auth_token}}
+
+{
+  "dayOfWeek": 3,
+  "startTime": "09:00",
+  "endTime": "13:30",
+  "periodStart": "2025-09-25",
+  "periodEnd": "2025-12-20"
+}
+
+###
+GET http://localhost:8080/api/veterinarian/available
+Authorization: {{auth_token}}
+
+
+###
+GET http://localhost:8080/api/veterinarian/1/visits/start/2025-10-25/end/2025-12-20
+Authorization: {{auth_token}}
+
+###
+POST http://localhost:8080/api/veterinarian/1/availability/1/exception/
+content-type: application/json
+
+{
+"reason": "error",
+"dayOfWeek": 1,
+"startTime": "09:00",
+"endTime": "13:30",
+"periodStart": "2025-09-25",
+"periodEnd": "2025-12-20"
+}
+
+
+###
+PUT http://localhost:8080/api/veterinarian/1/availability/1/exception/1
+content-type: application/json
+
+{
+  "reason": "error2",
+  "dayOfWeek": 1,
+  "startTime": "09:00",
+  "endTime": "13:30",
+  "periodStart": "2025-09-25",
+  "periodEnd": "2025-12-20"
+}
+
+###
+GET http://localhost:8080/api/veterinarian/1/availability
+
+
+###
+GET http://localhost:8080/api/veterinarian
+
+###
+DELETE http://localhost:8080/api/veterinarian/2/availability/1
+
+###
+DELETE http://localhost:8080/api/veterinarian/1/availability/1/exception/1
+
+###
+POST http://localhost:8080/api/medication
+content-type: application/json
+
+{
+"name": "Ibuprofeno",
+"activeIngredient": "Polvito",
+"dosageUnit": 1,
+"unitPrice": 2.5}
+
+###
+POST http://localhost:8080/api/medication/{id}/batches
+content-type: application/json
+
+{
+	"lotNumber":562134,
+	"receivedDate":"2025-10-13",
+	"expiryDate":"2025-10-30",
+	"initialQuantity": 20,
+	"purchagePricePerUnit": 1.5,
+	"storageLocation":"Almacen",
+	"reorderThreshold":4
+}
+
+###
+DELETE http://localhost:8080/api/medication/batches/1
+
+
+###
+POST http://localhost:8080/api/veterinarian/visit
+content-type: application/json
+Authorization: {{auth_token}}
+
+{
+    "petId": 1,
+    "ownerId": 2,
+    "agendaId": 1,
+    "startDate": "2025-11-13T09:30:00",
+    "duration": 30,
+    "reason": "Sacar puntos i curar",
+    "price": 10
+}
+
+
+###
+PUT http://localhost:8080/api/veterinarian/visits/1/initiate
+Authorization: {{auth_token}}
+
+###
+PUT http://localhost:8080/api/veterinarian/visits/1/complete
+Authorization: {{auth_token}}
+
+###
+PATCH http://localhost:8080/api/veterinarian/visits/1/diagnosis
+content-type: application/json
+
+{
+  "diagnosis": "El perro tiene una fractura en la pata trasera derecha.",
+  "notes": "Se recomienda reposo absoluto y analgésicos."
+}
+
+###
+POST http://localhost:8080/api/veterinarian/visits/1/prescribe-medication
+Content-Type: application/json
+
+{
+  "quantityPrescribed": 1,
+  "dosageInstructions": "ddd",
+  "duration": 3,
+  "visitID": 1,
+  "medicationId": 1
+}
+
+
+###
+POST http://localhost:8080/api/medication/1/batches
+Content-Type: application/json
+
+{
+  "lotNumber": 123456,
+  "receivedDate": "2025-10-20",
+  "expiryDate": "2028-10-20",
+  "initialQuantity": 10,
+  "purchagePricePerUnit": 5.0,
+  "storageLocation": "sss",
+  "reorderThreshold": 2
+}
+
+###
+POST http://localhost:8080/api/loyalty-tiers
+Content-Type: application/json
+
+{
+  "tierName": "Silver",
+  "requiredPoints": 100,
+  "discountPercentage": 10.0,
+  "benefitsDescription": "20% de descuento en vacunas"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
